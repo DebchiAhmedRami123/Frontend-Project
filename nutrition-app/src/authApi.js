@@ -18,7 +18,6 @@ export const signUp = async (userData) => {
   return response.data;
 };
 
-
 // ─── 2. LOGIN — STEP 1 (email check) ─────────────────────────────────────────
 // POST /auth/login
 // Body: { email }
