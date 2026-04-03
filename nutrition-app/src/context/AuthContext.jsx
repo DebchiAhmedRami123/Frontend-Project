@@ -10,7 +10,8 @@ export function AuthProvider({ children }) {
   useEffect(() => {
     const storedUser = localStorage.getItem('user')
     const storedRole = localStorage.getItem('role')
-    if (storedUser && storedRole) {
+    const storedToken = localStorage.getItem('access_token')
+    if (storedUser && storedRole && storedToken) {
       setUser(JSON.parse(storedUser))
       setRole(storedRole)
     }
@@ -20,7 +21,7 @@ export function AuthProvider({ children }) {
   const login = (userData, userRole, token) => {
     localStorage.setItem('user', JSON.stringify(userData))
     localStorage.setItem('role', userRole)
-    localStorage.setItem('token', token)
+    localStorage.setItem('access_token', token)
     setUser(userData)
     setRole(userRole)
   }
@@ -28,7 +29,8 @@ export function AuthProvider({ children }) {
   const logout = () => {
     localStorage.removeItem('user')
     localStorage.removeItem('role')
-    localStorage.removeItem('token')
+    localStorage.removeItem('access_token')
+    localStorage.removeItem('refresh_token')
     setUser(null)
     setRole(null)
   }

@@ -2,22 +2,16 @@ import axiosInstance from './axiosInstance';
 
 const BASE = '/auth';
 
+// ── Temp token storage (shared between login steps) ────────────────────────────
+let _tempToken = null;
+
+export const getTempToken = () => _tempToken;
+export const clearTempToken = () => { _tempToken = null; };
+
+// ── Sign Up ────────────────────────────────────────────────────────────────────
+
 export const signUp = async (userData) => {
   const res = await axiosInstance.post(`${BASE}/sign-up`, userData);
-  return res.data;
-};
-
-export const loginEmail = async (email) => {
-  const res = await axiosInstance.post(`${BASE}/login`, { email });
-  return res.data;
-};
-
-export const loginPassword = async (password) => {
-  const res = await axiosInstance.post(
-    `${BASE}/login-completion`,
-    { password },
-    { withCredentials: true }
-  );
   if (res.data.access_token) {
     localStorage.setItem('access_token', res.data.access_token);
     localStorage.setItem('refresh_token', res.data.refresh_token);
@@ -25,19 +19,57 @@ export const loginPassword = async (password) => {
   return res.data;
 };
 
+// ── Login Step 1 — email check ─────────────────────────────────────────────────
+
+export const loginEmail = async (email) => {
+  const res = await axiosInstance.post(`${BASE}/login`, { email });
+  // Store the temp_token for the password step
+  if (res.data.temp_token) {
+    _tempToken = res.data.temp_token;
+  }
+  return res.data;
+};
+
+// ── Login Step 2 — password verification ───────────────────────────────────────
+
+export const loginPassword = async (password) => {
+  const res = await axiosInstance.post(
+    `${BASE}/login-completion`,
+    { password, temp_token: _tempToken },
+    { withCredentials: true }
+  );
+  if (res.data.access_token) {
+    localStorage.setItem('access_token', res.data.access_token);
+    localStorage.setItem('refresh_token', res.data.refresh_token);
+  }
+  // Clean up temp token after successful login
+  _tempToken = null;
+  return res.data;
+};
+
+// ── Logout ─────────────────────────────────────────────────────────────────────
+
 export const logout = async () => {
   const res = await axiosInstance.delete(`${BASE}/logout`);
   localStorage.removeItem('access_token');
   localStorage.removeItem('refresh_token');
+  localStorage.removeItem('user');
+  localStorage.removeItem('role');
   return res.data;
 };
+
+// ── Delete Account ─────────────────────────────────────────────────────────────
 
 export const deleteAccount = async () => {
   const res = await axiosInstance.delete(`${BASE}/delete`);
   localStorage.removeItem('access_token');
   localStorage.removeItem('refresh_token');
+  localStorage.removeItem('user');
+  localStorage.removeItem('role');
   return res.data;
 };
+
+// ── Refresh Token ──────────────────────────────────────────────────────────────
 
 export const refreshToken = async () => {
   const refresh_token = localStorage.getItem('refresh_token');
@@ -52,10 +84,14 @@ export const refreshToken = async () => {
   return res.data;
 };
 
+// ── Profile ────────────────────────────────────────────────────────────────────
+
 export const getProfile = async () => {
   const res = await axiosInstance.get(`${BASE}/profile`);
   return res.data;
 };
+
+// ── Forgot Password ────────────────────────────────────────────────────────────
 
 export const forgotPassword = async (email) => {
   const res = await axiosInstance.post(
@@ -66,6 +102,8 @@ export const forgotPassword = async (email) => {
   return res.data;
 };
 
+// ── Reset Password ─────────────────────────────────────────────────────────────
+
 export const resetPassword = async (token, password, confirm_password) => {
   const res = await axiosInstance.post(`${BASE}/reset-password`, {
     token,
@@ -75,7 +113,8 @@ export const resetPassword = async (token, password, confirm_password) => {
   return res.data;
 };
 
-// Automatically handle expired tokens
+// ── Axios interceptor: auto-refresh expired tokens ─────────────────────────────
+
 axiosInstance.interceptors.response.use(
   (response) => response,
   async (error) => {
@@ -89,6 +128,8 @@ axiosInstance.interceptors.response.use(
       } catch {
         localStorage.removeItem('access_token');
         localStorage.removeItem('refresh_token');
+        localStorage.removeItem('user');
+        localStorage.removeItem('role');
         window.location.href = '/login';
       }
     }
