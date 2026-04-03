@@ -467,6 +467,15 @@ export default function Login() {
             <button onClick={() => { setRegErrors({}); goTo(1, 'backward') }} className="text-[#052B34] font-semibold hover:underline">Sign in</button>
           </p>
         )}
+        <div className="mt-8 pt-6 border-t border-gray-200/50 text-center">
+          <button 
+            onClick={() => navigate('/')} 
+            className="text-sm font-semibold text-gray-500 hover:text-[#052B34] transition-colors inline-flex items-center gap-2 group"
+          >
+            <span className="material-symbols-outlined text-[18px] group-hover:-translate-x-1 transition-transform">arrow_back</span>
+            Return to homepage
+          </button>
+        </div>
       </div>
     </div>
   )

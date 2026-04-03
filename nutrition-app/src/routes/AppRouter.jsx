@@ -11,9 +11,10 @@ import Contact from '../pages/public/Contact'
 
 // user
 import UserDashboard from '../pages/user/Dashboard'
-import FoodTracker from '../pages/user/FoodTracker'
-import FoodLog from '../pages/user/FoodLog'
-import ActivePlan from '../pages/user/ActivePlan'
+import Progress from '../pages/user/Progress'
+import FoodScan from '../pages/user/FoodScan'
+import MealLog from '../pages/user/MealLog'
+import Recommendations from '../pages/user/Recommendations'
 import BrowsePlans from '../pages/user/BrowsePlans'
 import BookConsultation from '../pages/user/BookConsultation'
 import UserProfile from '../pages/user/Profile'
@@ -50,9 +51,10 @@ export default function AppRouter() {
           {/* User */}
           <Route element={<RoleRoute role="client" />}>
             <Route path="/dashboard" element={<UserDashboard />} />
-            <Route path="/dashboard/tracker" element={<FoodTracker />} />
-            <Route path="/dashboard/log" element={<FoodLog />} />
-            <Route path="/dashboard/plan" element={<ActivePlan />} />
+            <Route path="/dashboard/progress" element={<Progress />} />
+            <Route path="/dashboard/scan" element={<FoodScan />} />
+            <Route path="/dashboard/log" element={<MealLog />} />
+            <Route path="/dashboard/recommendations" element={<Recommendations />} />
             <Route path="/dashboard/browse" element={<BrowsePlans />} />
             <Route path="/dashboard/book" element={<BookConsultation />} />
             <Route path="/dashboard/profile" element={<UserProfile />} />

@@ -1,8 +1,17 @@
-﻿import React from 'react';
+import React from 'react';
 import { useNavigate } from 'react-router-dom';
+import useAuth from '../../hooks/useAuth';
+
 
 const Navbar = () => {
   const navigate = useNavigate();
+  const { user, logout } = useAuth();
+  
+  const handleLogout = () => {
+    logout();
+    navigate('/');
+  };
+  
   return (
     <nav className="fixed top-0 left-1/2 -translate-x-1/2 w-[92%] max-w-6xl z-50 flex justify-between items-center px-8 py-4 bg-white/70 backdrop-blur-2xl rounded-full mt-6 shadow-2xl shadow-teal-900/10">
       <div className="text-2xl font-black tracking-tighter text-teal-950">NutriTrack</div>
@@ -26,18 +35,41 @@ const Navbar = () => {
       </div>
 
       <div className="flex items-center gap-4">
-        <button onClick={() => navigate('/login')} className="flex items-center justify-center group" title="Login">
-          <span className="material-symbols-outlined text-teal-950 cursor-pointer group-hover:scale-110 transition-transform">person</span>
-        </button>
-        <button onClick={() => navigate('/register')} className="bg-gradient-to-r from-secondary to-secondary-fixed-dim text-white px-6 py-2.5 rounded-full font-headline font-bold transition-all duration-300 hover:scale-105">
-          Get Started
-        </button>
+        {user ? (
+          <>
+            <button 
+              onClick={handleLogout} 
+              className="text-teal-900/60 hover:text-red-500 font-headline font-bold transition-all duration-300 px-2"
+              title="Logout"
+            >
+              Logout
+            </button>
+            <button 
+              onClick={() => navigate('/dashboard')} 
+              className="bg-gradient-to-r from-secondary to-secondary-fixed-dim text-white px-6 py-2.5 rounded-full font-headline font-bold transition-all duration-300 hover:scale-105"
+            >
+              Dashboard
+            </button>
+          </>
+        ) : (
+          <>
+            <button onClick={() => navigate('/login')} className="flex items-center justify-center group" title="Login">
+              <span className="material-symbols-outlined text-teal-950 cursor-pointer group-hover:scale-110 transition-transform">person</span>
+            </button>
+            <button onClick={() => navigate('/login')} className="bg-gradient-to-r from-secondary to-secondary-fixed-dim text-white px-6 py-2.5 rounded-full font-headline font-bold transition-all duration-300 hover:scale-105">
+              Get Started
+            </button>
+          </>
+        )}
       </div>
+
     </nav>
   );
 };
 const Hero = () => {
   const navigate = useNavigate();
+  const { user } = useAuth();
+
   return (
     <section className="relative pt-44 pb-32 overflow-hidden px-6">
       <div className="hero-gradient absolute inset-0 -z-10"></div>
@@ -58,15 +90,26 @@ const Hero = () => {
         </p>
 
         <div className="flex flex-col sm:flex-row justify-center gap-4 mb-20">
-          <button
-            onClick={() => navigate('/register')}
-            className="bg-primary-container text-white px-8 py-4 rounded-full font-headline font-bold text-lg hover:-translate-y-1 hover:shadow-xl transition-all duration-300"
-          >
-            Start Free Trial
-          </button>
-          <button className="bg-surface-container-lowest text-on-surface border border-outline-variant/30 px-8 py-4 rounded-full font-headline font-bold text-lg hover:bg-surface-container transition-all duration-300">
-            View Demo
-          </button>
+          {user ? (
+            <button
+              onClick={() => navigate('/dashboard')}
+              className="bg-primary-container text-white px-8 py-4 rounded-full font-headline font-bold text-lg hover:-translate-y-1 hover:shadow-xl transition-all duration-300"
+            >
+              Go to Dashboard
+            </button>
+          ) : (
+            <>
+              <button
+                onClick={() => navigate('/login')}
+                className="bg-primary-container text-white px-8 py-4 rounded-full font-headline font-bold text-lg hover:-translate-y-1 hover:shadow-xl transition-all duration-300"
+              >
+                Start Free Trial
+              </button>
+              <button className="bg-surface-container-lowest text-on-surface border border-outline-variant/30 px-8 py-4 rounded-full font-headline font-bold text-lg hover:bg-surface-container transition-all duration-300">
+                View Demo
+              </button>
+            </>
+          )}
         </div>
 
         {/* Dashboard mockup — card matches stitch exactly */}
@@ -97,7 +140,7 @@ const Plans = () => {
               <li className="flex items-center gap-2 text-sm font-medium"><span className="material-symbols-outlined text-secondary text-lg">check_circle</span> Macro Counter</li>
               <li className="flex items-center gap-2 text-sm font-medium opacity-40"><span className="material-symbols-outlined text-lg">block</span> AI Recognition</li>
             </ul>
-            <button onClick={() => navigate('/register')} className="w-full py-4 rounded-2xl bg-surface-container font-headline font-bold hover:bg-surface-container-high transition-colors">Start Free</button>
+            <button onClick={() => navigate('/login')} className="w-full py-4 rounded-2xl bg-surface-container font-headline font-bold hover:bg-surface-container-high transition-colors">Start Free</button>
           </div>
           {/* Standard (Featured) */}
           <div className="bg-primary-container p-10 rounded-3xl flex flex-col relative scale-105 shadow-2xl shadow-teal-900/20 border-2 border-secondary-fixed/50 hover:-translate-y-2 transition-all duration-300">
@@ -111,7 +154,7 @@ const Plans = () => {
               <li className="flex items-center gap-2 text-sm font-medium text-white"><span className="material-symbols-outlined text-secondary-fixed text-lg" style={{ fontVariationSettings: "'FILL' 1" }}>check_circle</span> AI Food Recognition</li>
               <li className="flex items-center gap-2 text-sm font-medium text-white"><span className="material-symbols-outlined text-secondary-fixed text-lg" style={{ fontVariationSettings: "'FILL' 1" }}>check_circle</span> DNA Insights Integration</li>
             </ul>
-            <button onClick={() => navigate('/register')} className="w-full py-4 rounded-2xl bg-gradient-to-r from-secondary to-secondary-fixed-dim text-white font-headline font-bold hover:shadow-lg hover:shadow-secondary/20 transition-all">Get Started</button>
+            <button onClick={() => navigate('/login')} className="w-full py-4 rounded-2xl bg-gradient-to-r from-secondary to-secondary-fixed-dim text-white font-headline font-bold hover:shadow-lg hover:shadow-secondary/20 transition-all">Get Started</button>
           </div>
           {/* Premium */}
           <div className="bg-surface-container-lowest p-10 rounded-3xl flex flex-col hover:-translate-y-2 transition-all duration-300 group">
@@ -124,7 +167,7 @@ const Plans = () => {
               <li className="flex items-center gap-2 text-sm font-medium"><span className="material-symbols-outlined text-secondary text-lg">check_circle</span> 1-on-1 Dietitian Access</li>
               <li className="flex items-center gap-2 text-sm font-medium"><span className="material-symbols-outlined text-secondary text-lg">check_circle</span> Personalized Meal Prep</li>
             </ul>
-            <button onClick={() => navigate('/register')} className="w-full py-4 rounded-2xl bg-surface-container font-headline font-bold hover:bg-surface-container-high transition-colors">Go Pro</button>
+            <button onClick={() => navigate('/login')} className="w-full py-4 rounded-2xl bg-surface-container font-headline font-bold hover:bg-surface-container-high transition-colors">Go Pro</button>
           </div>
         </div>
       </div>

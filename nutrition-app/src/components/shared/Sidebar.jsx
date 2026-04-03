@@ -5,11 +5,11 @@ import useAuth from '../../hooks/useAuth'
 
 const mainLinks = [
   { to: '/dashboard', icon: 'dashboard', label: 'Dashboard' },
-  { to: '/scan',      icon: 'restaurant', label: 'Nutrition' },
-  { to: '/log',       icon: 'description', label: 'Meal Log' },
-  { to: '/progress',  icon: 'insights', label: 'Progress' },
-  { to: '/consultations', icon: 'medical_services', label: 'Consults' },
-  { to: '/profile',   icon: 'person', label: 'Profile' },
+  { to: '/dashboard/scan', icon: 'document_scanner', label: 'AI Scanner' },
+  { to: '/dashboard/log', icon: 'description', label: 'Meal Log' },
+  { to: '/dashboard/progress',  icon: 'insights', label: 'Progress' },
+  { to: '/dashboard/recommendations', icon: 'auto_awesome', label: 'Recommendations' },
+  { to: '/dashboard/profile',   icon: 'person', label: 'Profile' },
 ]
 
 const roleLinks = [
@@ -19,10 +19,11 @@ const roleLinks = [
 
 const mobileLinks = [
   { to: '/dashboard', icon: 'dashboard', label: 'Home' },
-  { to: '/scan',      icon: 'restaurant', label: 'Scan' },
-  { to: '/log',       icon: 'description', label: 'Log' },
-  { to: '/progress',  icon: 'insights', label: 'Progress' },
-  { to: '/profile',   icon: 'person', label: 'Profile' },
+  { to: '/dashboard/scan', icon: 'document_scanner', label: 'AI Scan' },
+  { to: '/dashboard/log', icon: 'description', label: 'Log' },
+  { to: '/dashboard/progress',  icon: 'insights', label: 'Progress' },
+  { to: '/dashboard/recommendations', icon: 'auto_awesome', label: 'Recommendations' },
+  { to: '/dashboard/profile',   icon: 'person', label: 'Profile' },
 ]
 
 // ── Material icon helper ───────────────────────────────────────────────────────
@@ -40,7 +41,11 @@ function DesktopSidebar({ role, onLogout }) {
   return (
     <aside className="hidden md:flex fixed top-0 left-0 w-72 h-screen flex-col p-6 bg-slate-50 border-r border-slate-100/50 z-50">
       {/* Brand */}
-      <div className="mb-10">
+      <div 
+        onClick={() => navigate('/')}
+        className="mb-10 cursor-pointer hover:opacity-80 transition-opacity"
+        title="Go to Homepage"
+      >
         <span className="font-heading text-2xl font-bold tracking-tighter text-emerald-700">NutriTrack</span>
         <p className="text-[10px] uppercase tracking-widest text-slate-400 font-bold mt-1">AI Nutrition</p>
       </div>
@@ -89,11 +94,11 @@ function DesktopSidebar({ role, onLogout }) {
       {/* Bottom section */}
       <div className="mt-auto space-y-2 border-t border-slate-100 pt-6">
         <button
-          onClick={() => navigate('/scan')}
+          onClick={() => navigate('/dashboard/scan')}
           className="w-full vitality-gradient text-white rounded-full py-3 px-4 font-bold text-sm mb-4 flex items-center justify-center gap-2 soft-glow hover:shadow-lg transition-shadow"
         >
-          <Icon name="add" className="text-[18px]" />
-          Log Meal
+          <Icon name="add_a_photo" className="text-[18px]" />
+          Scan Meal
         </button>
         <button
           onClick={onLogout}
@@ -127,9 +132,10 @@ function TopBar({ onLogMeal }) {
         </button>
         <button
           onClick={onLogMeal}
-          className="vitality-gradient text-white px-6 py-2 rounded-full text-sm font-bold soft-glow"
+          className="vitality-gradient text-white px-6 py-2 rounded-full text-sm font-bold soft-glow flex items-center gap-2"
         >
-          Log Meal
+          <Icon name="document_scanner" className="text-[18px]" />
+          AI Scan
         </button>
         <div className="w-10 h-10 rounded-full bg-emerald-100 flex items-center justify-center text-emerald-700 font-bold text-sm">
           R
@@ -180,7 +186,7 @@ export default function Sidebar({ children }) {
   return (
     <div className="min-h-screen bg-[var(--color-surface)]">
       <DesktopSidebar role={role || 'client'} onLogout={handleLogout} />
-      <TopBar onLogMeal={() => navigate('/scan')} />
+      <TopBar onLogMeal={() => navigate('/dashboard/scan')} />
       <MobileBottomNav />
 
       <main className="md:ml-72 min-h-screen pb-20 md:pb-0 md:pt-20">
