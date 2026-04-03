@@ -19,19 +19,22 @@ import BrowsePlans from '../pages/user/BrowsePlans'
 import BookConsultation from '../pages/user/BookConsultation'
 import UserProfile from '../pages/user/Profile'
 
-// nutritionist
+import NutritionistLayout from '../pages/nutritionist/NutritionistLayout'
 import NutritionistDashboard from '../pages/nutritionist/Dashboard'
 import Consultations from '../pages/nutritionist/Consultations'
+import SessionNotes from '../pages/nutritionist/SessionNotes'
 import UserProgress from '../pages/nutritionist/UserProgress'
 import UploadPlan from '../pages/nutritionist/UploadPlan'
 import NutritionistProfile from '../pages/nutritionist/Profile'
 
 // admin
+import AdminLayout from '../pages/admin/AdminLayout'
 import AdminDashboard from '../pages/admin/Dashboard'
 import ManageUsers from '../pages/admin/ManageUsers'
 import ApproveNutritionists from '../pages/admin/ApproveNutritionists'
 import ManageSubscriptions from '../pages/admin/ManageSubscriptions'
 import Inquiries from '../pages/admin/Inquiries'
+import AssignNutritionist from '../pages/admin/AssignNutritionist'
 
 export default function AppRouter() {
   return (
@@ -62,20 +65,26 @@ export default function AppRouter() {
 
           {/* Nutritionist */}
           <Route element={<RoleRoute role="nutritionist" />}>
-            <Route path="/nutritionist" element={<NutritionistDashboard />} />
-            <Route path="/nutritionist/consultations" element={<Consultations />} />
-            <Route path="/nutritionist/progress/:userId" element={<UserProgress />} />
-            <Route path="/nutritionist/upload" element={<UploadPlan />} />
-            <Route path="/nutritionist/profile" element={<NutritionistProfile />} />
+            <Route element={<NutritionistLayout />}>
+              <Route path="/nutritionist/clients" element={<NutritionistDashboard />} />
+              <Route path="/nutritionist/consultations" element={<Consultations />} />
+              <Route path="/nutritionist/notes" element={<SessionNotes />} />
+              <Route path="/nutritionist/progress/:userId" element={<UserProgress />} />
+              <Route path="/nutritionist/upload" element={<UploadPlan />} />
+              <Route path="/nutritionist/profile" element={<NutritionistProfile />} />
+            </Route>
           </Route>
 
           {/* Admin */}
           <Route element={<RoleRoute role="admin" />}>
-            <Route path="/admin" element={<AdminDashboard />} />
-            <Route path="/admin/users" element={<ManageUsers />} />
-            <Route path="/admin/nutritionists" element={<ApproveNutritionists />} />
-            <Route path="/admin/subscriptions" element={<ManageSubscriptions />} />
-            <Route path="/admin/inquiries" element={<Inquiries />} />
+            <Route element={<AdminLayout />}>
+              <Route path="/admin/stats" element={<AdminDashboard />} />
+              <Route path="/admin/users" element={<ManageUsers />} />
+              <Route path="/admin/nutritionists" element={<ApproveNutritionists />} />
+              <Route path="/admin/subscriptions" element={<ManageSubscriptions />} />
+              <Route path="/admin/inquiries" element={<Inquiries />} />
+              <Route path="/admin/assign" element={<AssignNutritionist />} />
+            </Route>
           </Route>
 
         </Route>

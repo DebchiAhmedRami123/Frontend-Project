@@ -144,6 +144,7 @@ export default function Login() {
   const [regEmail, setRegEmail]     = useState('')
   const [regPass, setRegPass]       = useState('')
   const [regConfirm, setRegConfirm] = useState('')
+  const [regRole, setRegRole]       = useState('client')
   const [showRegPass, setShowRegPass] = useState(false)
   const [showRegConf, setShowRegConf] = useState(false)
   const [regErrors, setRegErrors]   = useState({})
@@ -164,8 +165,8 @@ export default function Login() {
   const redirectByRole = (role, approvalStatus) => {
     if (role === 'admin') navigate('/admin')
     else if (role === 'nutritionist') {
-      if (approvalStatus !== 'approved') return 'pending'
-      navigate('/nutritionist')
+      if (approvalStatus === 'pending') return 'pending'
+      navigate('/nutritionist/clients')
     } else navigate('/dashboard')
   }
 
@@ -221,11 +222,24 @@ export default function Login() {
     setLoadingReg(true)
     const parts = regName.trim().split(' ')
     try {
-      const data = await signUp({ first_name: parts[0], last_name: parts.slice(1).join(' ') || parts[0], email: regEmail, password: regPass })
-      login(data.user || {}, data.role || 'client', data.access_token)
-      setSuccessType('register')
-      goTo(4)
-      setTimeout(() => navigate('/dashboard'), 2500)
+      const payload = {
+        first_name: parts[0],
+        last_name: parts.slice(1).join(' ') || parts[0],
+        email: regEmail,
+        password: regPass,
+        role: regRole
+      }
+      const data = await signUp(payload)
+      login(data.user || {}, data.role || regRole, data.access_token)
+      
+      const result = redirectByRole(data.role || regRole, data.approval_status)
+      if (result === 'pending') {
+        setSuccessType('pending')
+        goTo(4)
+      } else {
+        setSuccessType('register')
+        goTo(4)
+      }
     } catch (err) {
       const raw = err.response?.data?.message || err.response?.data?.error
       const msg = typeof raw === 'object' && raw !== null
@@ -391,6 +405,31 @@ export default function Login() {
           </div>
           <h2 className="text-xl font-semibold text-[#052B34] mb-1">Create an account</h2>
           <p className="text-sm text-gray-500 mb-6">Join NutriTrack and start your journey</p>
+
+          <div className="flex gap-4 mb-6">
+            <button
+              onClick={() => setRegRole('client')}
+              className={`flex-1 py-3 px-4 rounded-xl border-2 text-sm font-semibold transition-all flex flex-col items-center gap-2 ${
+                regRole === 'client' 
+                  ? 'border-[#50CD95] bg-[#50CD95]/10 text-[#052B34]' 
+                  : 'border-gray-200 bg-white/50 text-gray-500 hover:border-gray-300'
+              }`}
+            >
+              <span className="material-symbols-outlined text-2xl">person</span>
+              Patient
+            </button>
+            <button
+              onClick={() => setRegRole('nutritionist')}
+              className={`flex-1 py-3 px-4 rounded-xl border-2 text-sm font-semibold transition-all flex flex-col items-center gap-2 ${
+                regRole === 'nutritionist' 
+                  ? 'border-[#052B34] bg-[#052B34]/5 text-[#052B34]' 
+                  : 'border-gray-200 bg-white/50 text-gray-500 hover:border-gray-300'
+              }`}
+            >
+              <span className="material-symbols-outlined text-2xl">medical_services</span>
+              Nutritionist
+            </button>
+          </div>
 
           {[
             { label: 'Full name', id: 'reg-name', type: 'text', val: regName, set: setRegName, err: regErrors.name, field: 'name', placeholder: 'Enter your full name', auto: 'name' },

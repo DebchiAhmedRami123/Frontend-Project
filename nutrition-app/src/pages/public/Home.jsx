@@ -5,11 +5,17 @@ import useAuth from '../../hooks/useAuth';
 
 const Navbar = () => {
   const navigate = useNavigate();
-  const { user, logout } = useAuth();
+  const { user, role, logout } = useAuth();
   
   const handleLogout = () => {
     logout();
     navigate('/');
+  };
+
+  const handleDashboardClick = () => {
+    if (role === 'admin') navigate('/admin/stats');
+    else if (role === 'nutritionist') navigate('/nutritionist/clients');
+    else navigate('/dashboard');
   };
   
   return (
@@ -45,7 +51,7 @@ const Navbar = () => {
               Logout
             </button>
             <button 
-              onClick={() => navigate('/dashboard')} 
+              onClick={handleDashboardClick} 
               className="bg-gradient-to-r from-secondary to-secondary-fixed-dim text-white px-6 py-2.5 rounded-full font-headline font-bold transition-all duration-300 hover:scale-105"
             >
               Dashboard
@@ -68,7 +74,13 @@ const Navbar = () => {
 };
 const Hero = () => {
   const navigate = useNavigate();
-  const { user } = useAuth();
+  const { user, role } = useAuth();
+
+  const handleDashboardClick = () => {
+    if (role === 'admin') navigate('/admin/stats');
+    else if (role === 'nutritionist') navigate('/nutritionist/clients');
+    else navigate('/dashboard');
+  };
 
   return (
     <section className="relative pt-44 pb-32 overflow-hidden px-6">
@@ -92,7 +104,7 @@ const Hero = () => {
         <div className="flex flex-col sm:flex-row justify-center gap-4 mb-20">
           {user ? (
             <button
-              onClick={() => navigate('/dashboard')}
+              onClick={handleDashboardClick}
               className="bg-primary-container text-white px-8 py-4 rounded-full font-headline font-bold text-lg hover:-translate-y-1 hover:shadow-xl transition-all duration-300"
             >
               Go to Dashboard
