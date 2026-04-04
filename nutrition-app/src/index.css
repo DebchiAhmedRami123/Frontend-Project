@@ -5,7 +5,7 @@
 @tailwind components;
 @tailwind utilities;
 
-/* ── Keep all your existing NutriTrack Design System stuff here! ── */
+/* ── Keep all your existing CaloAI Design System stuff here! ── */
 @theme {
   --color-primary: #006c49;
   /* ... your other variables ... */

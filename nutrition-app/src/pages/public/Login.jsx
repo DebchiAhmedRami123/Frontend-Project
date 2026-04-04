@@ -60,7 +60,7 @@ const Logo = () => (
         <path d="M18 14C18 14 14 17 14 20.5C14 22.9 15.8 24.5 18 24.5C20.2 24.5 22 22.9 22 20.5C22 17 18 14 18 14Z" fill="#50CD95"/>
       </svg>
     </div>
-    <span className="text-xl font-bold text-[#052B34] tracking-tight">NutriTrack</span>
+    <span className="text-xl font-bold text-[#052B34] tracking-tight">CaloAI</span>
   </div>
 )
 
@@ -404,7 +404,7 @@ export default function Login() {
             <Logo />
           </div>
           <h2 className="text-xl font-semibold text-[#052B34] mb-1">Create an account</h2>
-          <p className="text-sm text-gray-500 mb-6">Join NutriTrack and start your journey</p>
+          <p className="text-sm text-gray-500 mb-6">Join CaloAI and start your journey</p>
 
           <div className="flex gap-4 mb-6">
             <button

@@ -9,6 +9,7 @@ const mainLinks = [
   { to: '/dashboard/log', icon: 'description', label: 'Meal Log' },
   { to: '/dashboard/progress',  icon: 'insights', label: 'Progress' },
   { to: '/dashboard/recommendations', icon: 'auto_awesome', label: 'Recommendations' },
+  { to: '/dashboard/book', icon: 'event', label: 'Book Consultation' },
   { to: '/dashboard/profile',   icon: 'person', label: 'Profile' },
 ]
 
@@ -22,7 +23,7 @@ const mobileLinks = [
   { to: '/dashboard/scan', icon: 'document_scanner', label: 'AI Scan' },
   { to: '/dashboard/log', icon: 'description', label: 'Log' },
   { to: '/dashboard/progress',  icon: 'insights', label: 'Progress' },
-  { to: '/dashboard/recommendations', icon: 'auto_awesome', label: 'Recommendations' },
+  { to: '/dashboard/book', icon: 'event', label: 'Book' },
   { to: '/dashboard/profile',   icon: 'person', label: 'Profile' },
 ]
 
@@ -46,7 +47,7 @@ function DesktopSidebar({ role, onLogout }) {
         className="mb-10 cursor-pointer hover:opacity-80 transition-opacity"
         title="Go to Homepage"
       >
-        <span className="font-heading text-2xl font-bold tracking-tighter text-emerald-700">NutriTrack</span>
+        <span className="font-heading text-2xl font-bold tracking-tighter text-emerald-700">CaloAI</span>
         <p className="text-[10px] uppercase tracking-widest text-slate-400 font-bold mt-1">AI Nutrition</p>
       </div>
 
@@ -117,7 +118,7 @@ function DesktopSidebar({ role, onLogout }) {
 function TopBar({ onLogMeal }) {
   return (
     <header className="hidden md:flex fixed top-0 right-0 w-[calc(100%-18rem)] z-40 glass-bar border-b border-slate-100/50 justify-between items-center px-10 h-20">
-      <span className="font-heading font-extrabold text-xl text-emerald-800">NutriTrack Editorial</span>
+      <span className="font-heading font-extrabold text-xl text-emerald-800">CaloAI Editorial</span>
       <div className="flex items-center gap-4">
         <div className="relative">
           <input

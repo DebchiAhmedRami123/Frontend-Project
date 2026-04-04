@@ -34,7 +34,7 @@ function DesktopSidebar({ onLogout }) {
         className="mb-10 cursor-pointer hover:opacity-80 transition-opacity"
         title="Go to Homepage"
       >
-        <span className="font-heading text-2xl font-bold tracking-tighter text-emerald-700">NutriTrack</span>
+        <span className="font-heading text-2xl font-bold tracking-tighter text-emerald-700">CaloAI</span>
         <p className="text-[10px] uppercase tracking-widest text-[#052B34] font-extrabold mt-1">PRO PORTAL</p>
       </div>
 

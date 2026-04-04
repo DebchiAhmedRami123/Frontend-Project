@@ -15,7 +15,6 @@ import Progress from '../pages/user/Progress'
 import FoodScan from '../pages/user/FoodScan'
 import MealLog from '../pages/user/MealLog'
 import Recommendations from '../pages/user/Recommendations'
-import BrowsePlans from '../pages/user/BrowsePlans'
 import BookConsultation from '../pages/user/BookConsultation'
 import UserProfile from '../pages/user/Profile'
 
@@ -58,7 +57,6 @@ export default function AppRouter() {
             <Route path="/dashboard/scan" element={<FoodScan />} />
             <Route path="/dashboard/log" element={<MealLog />} />
             <Route path="/dashboard/recommendations" element={<Recommendations />} />
-            <Route path="/dashboard/browse" element={<BrowsePlans />} />
             <Route path="/dashboard/book" element={<BookConsultation />} />
             <Route path="/dashboard/profile" element={<UserProfile />} />
           </Route>

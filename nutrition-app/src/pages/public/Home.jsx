@@ -20,7 +20,7 @@ const Navbar = () => {
   
   return (
     <nav className="fixed top-0 left-1/2 -translate-x-1/2 w-[92%] max-w-6xl z-50 flex justify-between items-center px-8 py-4 bg-white/70 backdrop-blur-2xl rounded-full mt-6 shadow-2xl shadow-teal-900/10">
-      <div className="text-2xl font-black tracking-tighter text-teal-950">NutriTrack</div>
+      <div className="text-2xl font-black tracking-tighter text-teal-950">CaloAI</div>
 
       <div className="hidden md:flex gap-8 items-center">
         {/* Active Link (Features) */}
@@ -239,7 +239,7 @@ const WhyUs = () => (
     <div className="max-w-7xl mx-auto">
       <div className="flex flex-col md:flex-row justify-between items-end mb-16 gap-8">
         <div className="max-w-2xl">
-          <h2 className="font-headline text-4xl md:text-5xl font-extrabold tracking-tight text-primary-container mb-4">Why NutriTrack?</h2>
+          <h2 className="font-headline text-4xl md:text-5xl font-extrabold tracking-tight text-primary-container mb-4">Why CaloAI?</h2>
           <p className="font-body text-on-surface-variant">We combine clinical research with silicon valley technology to give you an unfair advantage in health.</p>
         </div>
         <a className="font-headline font-bold text-secondary flex items-center gap-2 group" href="#">
@@ -281,7 +281,7 @@ const Testimonials = () => (
             <span className="material-symbols-outlined text-secondary" style={{ fontVariationSettings: "'FILL' 1" }}>star</span>
             <span className="material-symbols-outlined text-secondary" style={{ fontVariationSettings: "'FILL' 1" }}>star</span>
           </div>
-          <p className="font-body text-on-surface-variant italic mb-8 leading-relaxed">"NutriTrack changed how I see food. The AI scanning is like magic, and the data insights are scary accurate."</p>
+          <p className="font-body text-on-surface-variant italic mb-8 leading-relaxed">"CaloAI changed how I see food. The AI scanning is like magic, and the data insights are scary accurate."</p>
           <div className="flex items-center gap-4">
             <div className="w-12 h-12 rounded-full bg-secondary-fixed flex items-center justify-center text-primary-container font-bold text-xl">S</div>
             <div>
@@ -298,7 +298,7 @@ const Testimonials = () => (
             <span className="material-symbols-outlined text-secondary" style={{ fontVariationSettings: "'FILL' 1" }}>star</span>
             <span className="material-symbols-outlined text-secondary" style={{ fontVariationSettings: "'FILL' 1" }}>star</span>
           </div>
-          <p className="font-body text-on-surface-variant italic mb-8 leading-relaxed">"The transition from generic tracking to NutriTrack was night and day. It's the luxury watch of nutrition apps."</p>
+          <p className="font-body text-on-surface-variant italic mb-8 leading-relaxed">"The transition from generic tracking to CaloAI was night and day. It's the luxury watch of nutrition apps."</p>
           <div className="flex items-center gap-4">
             <div className="w-12 h-12 rounded-full bg-secondary-fixed flex items-center justify-center text-primary-container font-bold text-xl">D</div>
             <div>
@@ -332,8 +332,8 @@ const Testimonials = () => (
 const Footer = () => (
   <footer className="w-full py-16 px-12 flex flex-col md:flex-row justify-between items-center gap-8 bg-teal-950 text-white">
     <div className="flex flex-col items-center md:items-start gap-4">
-      <div className="text-xl font-bold text-teal-300">NutriTrack</div>
-      <p className="font-body text-sm tracking-wide text-teal-200/50">© 2024 NutriTrack. Precision in Digital Vitality.</p>
+      <div className="text-xl font-bold text-teal-300">CaloAI</div>
+      <p className="font-body text-sm tracking-wide text-teal-200/50">© 2024 CaloAI. Precision in Digital Vitality.</p>
     </div>
     <div className="flex gap-8">
       <a className="font-body text-sm tracking-wide text-teal-200/50 hover:text-teal-300 transition-colors duration-300" href="#">Privacy Policy</a>

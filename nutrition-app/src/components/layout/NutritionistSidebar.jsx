@@ -22,7 +22,7 @@ export default function NutritionistSidebar() {
           <path d="M18 8C18 8 10 13 10 19.5C10 24.1 13.6 27 18 27C22.4 27 26 24.1 26 19.5C26 13 18 8 18 8Z" fill="white" opacity="0.9"/>
           <path d="M18 14C18 14 14 17 14 20.5C14 22.9 15.8 24.5 18 24.5C20.2 24.5 22 22.9 22 20.5C22 17 18 14 18 14Z" fill="#50CD95"/>
         </svg>
-        <span className="font-semibold text-[#052B34] text-sm">NutriTrack</span>
+        <span className="font-semibold text-[#052B34] text-sm">CaloAI</span>
       </div>
 
       <nav className="flex-1 flex flex-col gap-1 px-3">

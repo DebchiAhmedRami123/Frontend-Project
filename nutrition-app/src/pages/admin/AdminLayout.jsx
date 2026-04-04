@@ -35,7 +35,7 @@ export default function AdminLayout() {
         {/* Brand Area */}
         <div className="p-8">
           <Link to="/" className="inline-block hover:opacity-80 transition-opacity">
-            <span className="font-headline text-3xl font-extrabold tracking-tighter text-teal-700">NutriTrack</span>
+            <span className="font-headline text-3xl font-extrabold tracking-tighter text-teal-700">CaloAI</span>
             <div className="flex items-center gap-2 mt-1">
               <span className="text-[11px] font-black uppercase tracking-[0.2em] text-slate-700">Admin</span>
               <span className="relative flex h-2 w-2">
