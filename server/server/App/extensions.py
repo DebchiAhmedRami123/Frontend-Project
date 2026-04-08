@@ -12,7 +12,7 @@ mail = Mail()
 s = serializer  # not initialized here — we need the secret key
 
 
-# ── In-memory Redis fallback for development ────────────────────────────────────
+# In-memory Redis fallback for development
 
 class MemoryStore:
     """Drop-in replacement for redis.Redis when Redis is not available."""
@@ -97,3 +97,4 @@ def unauthorized_response(error):
 @jwt.revoked_token_loader
 def revoked_token_response(jwt_header, jwt_data):
     return {"error": "Token has been revoked, please log in again"}, 401
+    

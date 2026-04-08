@@ -1,77 +1,7 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import useAuth from '../../hooks/useAuth';
-
-
-const Navbar = () => {
-  const navigate = useNavigate();
-  const { user, role, logout } = useAuth();
-  
-  const handleLogout = () => {
-    logout();
-    navigate('/');
-  };
-
-  const handleDashboardClick = () => {
-    if (role === 'admin') navigate('/admin/stats');
-    else if (role === 'nutritionist') navigate('/nutritionist/clients');
-    else navigate('/dashboard');
-  };
-  
-  return (
-    <nav className="fixed top-0 left-1/2 -translate-x-1/2 w-[92%] max-w-6xl z-50 flex justify-between items-center px-8 py-4 bg-white/70 backdrop-blur-2xl rounded-full mt-6 shadow-2xl shadow-teal-900/10">
-      <div className="text-2xl font-black tracking-tighter text-teal-950">CaloAI</div>
-
-      <div className="hidden md:flex gap-8 items-center">
-        {/* Active Link (Features) */}
-        <a className="font-headline tracking-tight font-semibold text-teal-950 border-b-2 border-teal-500 pb-1 hover:text-teal-950 transition-all duration-300" href="#">
-          Features
-        </a>
-
-        {/* Inactive Links */}
-        <a className="font-headline tracking-tight font-semibold text-teal-800/60 hover:text-teal-950 transition-all duration-300" href="#">
-          For Professionals
-        </a>
-        <a className="font-headline tracking-tight font-semibold text-teal-800/60 hover:text-teal-950 transition-all duration-300" href="#">
-          Pricing
-        </a>
-        <a className="font-headline tracking-tight font-semibold text-teal-800/60 hover:text-teal-950 transition-all duration-300" href="#">
-          Testimonials
-        </a>
-      </div>
-
-      <div className="flex items-center gap-4">
-        {user ? (
-          <>
-            <button 
-              onClick={handleLogout} 
-              className="text-teal-900/60 hover:text-red-500 font-headline font-bold transition-all duration-300 px-2"
-              title="Logout"
-            >
-              Logout
-            </button>
-            <button 
-              onClick={handleDashboardClick} 
-              className="bg-gradient-to-r from-secondary to-secondary-fixed-dim text-white px-6 py-2.5 rounded-full font-headline font-bold transition-all duration-300 hover:scale-105"
-            >
-              Dashboard
-            </button>
-          </>
-        ) : (
-          <>
-            <button onClick={() => navigate('/login')} className="flex items-center justify-center group" title="Login">
-              <span className="material-symbols-outlined text-teal-950 cursor-pointer group-hover:scale-110 transition-transform">person</span>
-            </button>
-            <button onClick={() => navigate('/login')} className="bg-gradient-to-r from-secondary to-secondary-fixed-dim text-white px-6 py-2.5 rounded-full font-headline font-bold transition-all duration-300 hover:scale-105">
-              Get Started
-            </button>
-          </>
-        )}
-      </div>
-
-    </nav>
-  );
-};
+import Navbar from '../../components/layout/Navbar';
 const Hero = () => {
   const navigate = useNavigate();
   const { user, role } = useAuth();
@@ -134,7 +64,7 @@ const Hero = () => {
 const Plans = () => {
   const navigate = useNavigate();
   return (
-    <section className="py-24 bg-surface-container-low px-6">
+    <section id="pricing" className="py-24 bg-surface-container-low px-6">
       <div className="max-w-7xl mx-auto">
         <div className="text-center mb-16">
           <h2 className="font-headline text-4xl md:text-5xl font-extrabold tracking-tight text-primary-container mb-4">Our Plans</h2>
@@ -188,7 +118,7 @@ const Plans = () => {
 };
 
 const AISection = () => (
-  <section className="py-24 px-6 overflow-hidden">
+  <section id="ai-recognition" className="py-24 px-6 overflow-hidden">
     <div className="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
       <div>
         <div className="inline-flex items-center gap-2 px-4 py-1.5 bg-primary-container text-secondary-fixed rounded-full text-xs font-bold tracking-widest uppercase mb-6">
@@ -235,7 +165,7 @@ const AISection = () => (
 );
 
 const WhyUs = () => (
-  <section className="py-24 bg-white px-6">
+  <section id="features" className="py-24 bg-white px-6">
     <div className="max-w-7xl mx-auto">
       <div className="flex flex-col md:flex-row justify-between items-end mb-16 gap-8">
         <div className="max-w-2xl">
@@ -269,7 +199,7 @@ const WhyUs = () => (
 );
 
 const Testimonials = () => (
-  <section className="py-24 bg-surface px-6">
+  <section id="testimonials" className="py-24 bg-surface px-6">
     <div className="max-w-7xl mx-auto">
       <h2 className="font-headline text-4xl font-extrabold tracking-tight text-center mb-16 text-primary-container">Trusted by 100k+ Vitality Seekers</h2>
       <div className="grid grid-cols-1 md:grid-cols-3 gap-8">

@@ -6,8 +6,8 @@ import RoleRoute from './RoleRoute'
 import Home from '../pages/public/Home'
 import Login from '../pages/public/Login'
 import RegisterUser from '../pages/public/RegisterUser'
-import RegisterNutritionist from '../pages/public/RegisterNutritionist'
 import Contact from '../pages/public/Contact'
+import ApplyNutritionist from '../pages/public/ApplyNutritionist'
 
 // user
 import UserDashboard from '../pages/user/Dashboard'
@@ -44,7 +44,7 @@ export default function AppRouter() {
         <Route path="/" element={<Home />} />
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<RegisterUser />} />
-        <Route path="/register/nutritionist" element={<RegisterNutritionist />} />
+        <Route path="/apply-nutritionist" element={<ApplyNutritionist />} />
         <Route path="/contact" element={<Contact />} />
 
         {/* ── Protected ── */}
