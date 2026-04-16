@@ -5,7 +5,8 @@ import os
 sys.path.append(r'c:\Users\HP\Desktop\AI Calorie Estimation System Project\Frontend Project\server\server')
 
 from App import create_app
-from App.models import db, User
+from App.models import User
+from App.extensions import db
 
 app = create_app()
 

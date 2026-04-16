@@ -4,12 +4,24 @@ from flask_jwt_extended import JWTManager
 from flask_mail import Mail
 from itsdangerous import URLSafeTimedSerializer as serializer
 import time
+from flask_migrate import Migrate
 from datetime import timedelta
+from flask_sqlalchemy import SQLAlchemy
+from sqlalchemy.orm import DeclarativeBase
 
 bc = Bcrypt()
 ma = Marshmallow()
 mail = Mail()
+migrate = Migrate()
 s = serializer  # not initialized here — we need the secret key
+
+class Base(DeclarativeBase):
+    def __repr__(self):
+        cols = [f"{c}={getattr(self, c)}" for c in self.__mapper__.columns.keys()]
+        return f"{self.__class__.__name__}({', '.join(cols)})"
+
+
+db = SQLAlchemy(model_class=Base)
 
 
 # ── In-memory Redis fallback for development ────────────────────────────────────
@@ -75,6 +87,13 @@ try:
 except Exception:
     print("WARNING: Redis not available — using in-memory store (development mode)")
     redis_client = MemoryStore()
+
+# Do you need the MemoryStore on your local PC?
+# If you are comfortable installing Redis (via Docker, apt, brew, or Windows Subsystem for Linux) 
+# and you want the full Redis experience – you don’t need this fallback. You can just run Redis and connect to it.
+# But the fallback is a convenience for cases where you want to:
+# Write code that works anywhere without extra setup.
+# Switch between “real Redis in production” and “no Redis in development” without changing code (just swap the client object).
 
 
 # ── JWT setup ───────────────────────────────────────────────────────────────────

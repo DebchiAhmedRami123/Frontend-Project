@@ -1,9 +1,8 @@
 import enum
 from datetime import datetime
 import uuid
-from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy.dialects.postgresql import UUID
-from sqlalchemy.orm import DeclarativeBase,Mapped, mapped_column, relationship
+from sqlalchemy.orm import Mapped, mapped_column, relationship
 from sqlalchemy import (
     String,
     Integer,
@@ -12,51 +11,63 @@ from sqlalchemy import (
     DateTime,
     Text,
     Boolean,
-    Float
+    Float,
+    Column
 )
 from typing import List, Optional
 from flask import current_app, jsonify
 from itsdangerous import URLSafeTimedSerializer as Serializer, SignatureExpired, BadSignature
+from App.extensions import db, Base
 
 
-class Base(DeclarativeBase):
-    def __repr__(self):
-        cols = [f"{c}={getattr(self, c)}" for c in self.__mapper__.columns.keys()]
-        return f"{self.__class__.__name__}({', '.join(cols)})"
-
-db = SQLAlchemy(model_class=Base)
+class PermissionEnum(enum.Enum):
+    MANAGEUSERS = "manage_users"      
+    MANAGECONTENT = "manage_content"
+    MANAGENUTRITIONISTS = "manage_nutritionists"
+    VIEWFEEDBACK = "view_feedback"
+    VIEWSTATISTICS = "view_statistics"
 
 class GenderEnum(enum.Enum):
-    male   = "male"
-    female = "female"
-    other  = "other"
-
+    MALE   = "male"
+    FEMALE = "female"
+    OTHER  = "other"
 
 class StatusEnum(enum.Enum):
-    active   = "active"
-    inactive = "inactive"
-    banned   = "banned"
+    ACTIVE   = "active"
+    INACTIVE = "inactive"
+    PENDING  = "pending"
+    BANNED   = "banned"
+    
 
-
-class User(Base):
+class User(Base): 
 
     __mapper_args__ = {
         "polymorphic_on":       "user_type",
-        "polymorphic_identity": "user"
+        "polymorphic_identity": "user" # allow SQLAlchemy will automatically set user_type = "user"
     }
 
     __tablename__ = 'users'
     id:Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True),primary_key=True, default=uuid.uuid4)
-    first_name:Mapped[str] = mapped_column(String(100), nullable=False)
-    last_name:Mapped[str] = mapped_column(String(100), nullable=False)
+    full_name:Mapped[str] = mapped_column(String(100), nullable=False)
     email:Mapped[str] = mapped_column(String(150), unique=True, nullable=False)
     password:Mapped[str] = mapped_column(String(255), nullable=False)
     phone:Mapped[Optional[str]] = mapped_column(String(20),  nullable=True)
-    status:Mapped[StatusEnum] = mapped_column(Enum(StatusEnum), default=StatusEnum.active)
+    status:Mapped[StatusEnum] = mapped_column(Enum(StatusEnum), default=StatusEnum.ACTIVE)
     image:Mapped[Optional[str]] = mapped_column(String(255), nullable=True)
-    created_at:Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow)
+    created_at:Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow)      
 
-    user_type:Mapped[str] = mapped_column(String(50), nullable=False)
+    #user_type column is only to tell SQLAlchemy which Python class to instantiate when it loads a row from the users table.
+    user_type:Mapped[str] = mapped_column(String(50), nullable=False) 
+    #without it:
+    #running of this query: SELECT * FROM users WHERE id = 'some-uuid';
+    # It gets back a row. But now it has a problem:
+    # "Should I return this as a User object? A Client object? A Nutritionist object?"
+
+    # Link to role-specific profile uselist=False -> means one to one relaionship
+    admin_profile        = db.relationship('Admin', backref='user', uselist=False) 
+    nutritionist_profile = db.relationship('Nutritionist', backref='user', uselist=False)
+    patient_profile      = db.relationship('Patient', backref='user', uselist=False)
+
 
     def to_dict(self):
         return {
@@ -71,9 +82,9 @@ class User(Base):
 
     def get_reset_token(self):
         s = Serializer(current_app.config['SECRET_KEY'],
-                        salt=current_app.config['RESET_PASSWORD_SALT']
-                       )
-        return s.dumps(str(self.id))
+                       salt=current_app.config['RESET_PASSWORD_SALT']
+                       )    
+        return s.dumps(str(self.id)) #generate the token
 
     @staticmethod
     def check_reset_token(token):
@@ -89,12 +100,11 @@ class User(Base):
             return jsonify({'message': 'Invalid Reset Link'}),400
         return db.session.get(User,user_id)
 
+class Patient(User):
 
-class Client(User):
+    __mapper_args__ = {"polymorphic_identity": "patient"}
 
-    __mapper_args__ = {"polymorphic_identity": "client"}
-
-    __tablename__ = 'client'
+    __tablename__ = 'patients'
     id: Mapped[uuid.UUID] = mapped_column(ForeignKey("users.id"), primary_key=True)
     weight: Mapped[Optional[float]] = mapped_column(Float, nullable=True)
     height: Mapped[Optional[float]] = mapped_column(Float, nullable=True)
@@ -109,9 +119,9 @@ class Client(User):
         ForeignKey("nutritionists.id", ondelete="CASCADE"), nullable=True
     )
     nutritionist:Mapped[Optional["Nutritionist"]] = relationship('Nutritionist',
-                                                                     back_populates='clients',
-                                                                    foreign_keys=[nutritionist_id]
-                                                                  )
+                                                                back_populates='patients',
+                                                                foreign_keys=[nutritionist_id]
+                                                                )
 
 class Nutritionist(User):
 
@@ -122,12 +132,23 @@ class Nutritionist(User):
     specialty:Mapped[Optional[str]] = mapped_column(String(200), nullable=True)
     bio:Mapped[Optional[str]] = mapped_column(Text, nullable=True)
     years_of_experience:Mapped[Optional[int]] = mapped_column(Integer, nullable=True)
+    status:Mapped[StatusEnum] = mapped_column(Enum(StatusEnum), default=StatusEnum.PENDING)
     availability: Mapped[bool] = mapped_column(Boolean, default=True)
+    # Admin check fields
+    license_number = mapped_column(String(100), nullable=False)
+    license_issuer = mapped_column(String(200), nullable=False)
+    license_expiry = mapped_column(DateTime, nullable=False)
+    license_doc    = mapped_column(String(255), nullable=False)
+    # Admin review fields
+    reviewed_by    = mapped_column(ForeignKey('users.id'), nullable=True)  # admin id
+    reviewed_at    = mapped_column(DateTime, nullable=True)
+    reject_reason  = mapped_column(String(255), nullable=True)
 
-    clients: Mapped[List["Client"]] = relationship(
-        "Client",
+
+    patients: Mapped[List["Patient"]] = relationship(
+        "Patient",
         back_populates="nutritionist",
-        foreign_keys="[Client.nutritionist_id]"
+        foreign_keys="[Patient.nutritionist_id]"
     )
 
 class Admin(User):
@@ -137,10 +158,42 @@ class Admin(User):
     __tablename__ = "admins"
 
     id: Mapped[uuid.UUID] = mapped_column(ForeignKey("users.id"), primary_key=True)
+    is_super_admin: Mapped[bool] = mapped_column(Boolean, default=False)
 
-    # ── Permission flags ──
-    manage_users:         Mapped[bool] = mapped_column(Boolean, default=True)
-    manage_content:       Mapped[bool] = mapped_column(Boolean, default=True)
-    manage_nutritionists: Mapped[bool] = mapped_column(Boolean, default=True)
-    view_feedback:        Mapped[bool] = mapped_column(Boolean, default=True)
-    view_statistics:      Mapped[bool] = mapped_column(Boolean, default=True)
+    permissions = db.relationship('Permission', 
+                                  secondary='admin_permissions', 
+                                  backref='admins'
+                                )
+
+
+class Permission(Base):
+    __tablename__ = "permissions"
+
+    id: Mapped[uuid.UUID] = mapped_column(primary_key=True)
+    name: Mapped[PermissionEnum] = mapped_column(
+        Enum(PermissionEnum, name="permission_enum"), 
+        #the name's attribute is the name of type which will be created
+        unique=True,
+        nullable=False,
+        native_enum=True # allow the to apply the restrictions of this values on database level
+    )
+    description: Mapped[str] = mapped_column(String(255), nullable=True)
+
+
+admin_permissions = db.Table('admin_permissions',
+    Base.metadata,
+    Column('admin_id', UUID(as_uuid=True), db.ForeignKey('admins.id'),primary_key=True),
+    Column('permission_id', UUID(as_uuid=True), db.ForeignKey('permissions.id'))
+)
+
+class StatusLog(Base):
+    """Audit trail for every status change"""
+    __tablename__ = 'status_logs'
+
+    id: Mapped[uuid.UUID] = mapped_column(primary_key=True)
+    user_id: Mapped[uuid.UUID] = mapped_column(ForeignKey("users.id"), nullable=False)
+    old_status: Mapped[StatusEnum] = mapped_column(Enum(StatusEnum), nullable=False)    
+    new_status: Mapped[StatusEnum] = mapped_column(Enum(StatusEnum), nullable=False)
+    changed_by: Mapped[uuid.UUID] = mapped_column(ForeignKey("users.id"))
+    reason: Mapped[str] = mapped_column(String(255)) # admin who did it
+    changed_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow)

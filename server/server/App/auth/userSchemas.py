@@ -5,14 +5,16 @@ from ..extensions import ma
 class BaseSchema(ma.SQLAlchemyAutoSchema):
     class Meta:
         model = User
-        load_instance = False
+        load_instance = False # return dicts instead of model instance
         unknown = EXCLUDE
 
 class SignSchema(BaseSchema):
+    # when we use fields.* we cancel the auto connection with SQLAlchemy model so we loss the reference type from the model and the metadata (nullable, length, etc)
+    # while the using of ma.auto_field() allow to add the validators with the same they are defined in the model
     id         = ma.auto_field(dump_only=True)
     created_at = ma.auto_field(dump_only=True)
-    user_type  = ma.auto_field(dump_only=True)
     status     = ma.auto_field(dump_only=True)
+    image      = ma.auto_field(required=False, allow_none=True) #override the model validators for determine the optionality or we can exclude it directly  
 
     email = ma.auto_field(required=True, validate=validate.Email())
     phone = ma.auto_field(required=False, validate=[validate.Regexp(r'^(?:\+213|0)(5|6|7)[0-9]{8}$')])
@@ -20,40 +22,51 @@ class SignSchema(BaseSchema):
                              validate=[validate.Length(min=8, max=50),
                                     validate.Regexp(r'^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[^A-Za-z0-9]).+$',
                                     error="Password must contain at least one lowercase, uppercase, digit, and special character")])
+    full_name = ma.auto_field(required=True, validate=[validate.Length(min=2, max=100)])
 
-    @validates('first_name')
-    def validate_first_name(self, data, **kwargs):
-        if any(not (char.isalpha() or char == " ") for char in data):
-            raise ValidationError("Name must not contain numbers")
-        return data
-
-    @validates('last_name')
-    def validate_last_name(self, data, **kwargs):
+    @validates('full_name')
+    def validate_full_name(self, data, **kwargs):
         if any(not (char.isalpha() or char == " ") for char in data) or len(data) < 2:
             raise ValidationError("Name must not contain numbers/symbols and must be at least 2 characters")
-        return data
 
-    @pre_load
+    @validates('email')
     def validate_email_unique(self, data, **kwargs):
-        if db.session.query(User).filter(User.email == data.get('email')).first():
+        if db.session.query(User).filter(User.email == data).first():
             raise ValidationError("Email already exists", field_name="email")
-        return data
 
-    @validates('password')
-    def validate_password(self, data, **kwargs):
-        pass
+class LoginSchema(BaseSchema):
+    email = ma.auto_field(required=True)
+    password = ma.auto_field(required=False, load_only=True)
 
-class LoginSchema(Schema):
-    email = fields.Email(required=True)
-    password = fields.Str(required=False, load_only=True)
-
-class ResetPasswordSchema(Schema):
+class ResetPasswordSchema(BaseSchema):
     token = fields.Str(required=True)
-    password = fields.Str(required=True, load_only=True,
+    password = ma.auto_field(required=True, load_only=True,
                           validate=[validate.Length(min=8, max=50)])
-    confirm_password = fields.Str(required=True, load_only=True)
+    confirm_password = ma.auto_field(required=True, load_only=True)
 
     @validates_schema
     def validate_passwords_match(self, data, **kwargs):
-        if data.get('password') != data.get('confirm_password'):
+        if data.get('password') != data:
             raise ValidationError("Passwords must match", field_name="confirm_password")
+        
+class PatientRoleSchema(BaseSchema):
+    diet_plan = ma.auto_field(dump_only=True)
+    appointment_date = ma.auto_field(dump_only=True)
+
+    weight = ma.auto_field(required=True, validate=validate.Range(min=5))
+    height = ma.auto_field(required=True, validate=validate.Range(min=80))
+    age    = ma.auto_field(required=True, validate=validate.Range(min=0))
+    gender = ma.auto_field(required=True, validate=validate.OneOf(["male", "female", "other"]))
+    weight_goal = ma.auto_field(required=True, validate=validate.Range(min=5))
+
+class NutritionistRoleSchema(BaseSchema):
+    speciality = ma.auto_field(required=True, validate=validate.Length(min=2, max=100))
+    bio = ma.auto_field(required=False, validate=validate.Length(max=500))
+    years_of_experience = ma.auto_field(required=True, validate=validate.Range(min=0,max=50))
+
+class UserStatusUpdateSchema(BaseSchema):
+    status = fields.Str(required=True, validate=validate.OneOf(["active", "inactive", "banned"]))
+
+class AdminSignInSchema(SignSchema):
+    is_super_admin = ma.auto_field(required=False, dump_only=True)
+
