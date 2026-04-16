@@ -24,7 +24,7 @@ class Base(DeclarativeBase):
 db = SQLAlchemy(model_class=Base)
 
 
-# ── In-memory Redis fallback for development ────────────────────────────────────
+# In-memory Redis fallback for development
 
 class MemoryStore:
     """Drop-in replacement for redis.Redis when Redis is not available."""

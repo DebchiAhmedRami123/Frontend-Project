@@ -124,7 +124,6 @@ class Patient(User):
                                                                 )
 
 class Nutritionist(User):
-
     __mapper_args__ = {"polymorphic_identity": "nutritionist"}
 
     __tablename__ = 'nutritionists'

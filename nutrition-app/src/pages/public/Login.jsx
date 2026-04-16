@@ -404,32 +404,7 @@ export default function Login() {
             <Logo />
           </div>
           <h2 className="text-xl font-semibold text-[#052B34] mb-1">Create an account</h2>
-          <p className="text-sm text-gray-500 mb-6">Join CaloAI and start your journey</p>
-
-          <div className="flex gap-4 mb-6">
-            <button
-              onClick={() => setRegRole('client')}
-              className={`flex-1 py-3 px-4 rounded-xl border-2 text-sm font-semibold transition-all flex flex-col items-center gap-2 ${
-                regRole === 'client' 
-                  ? 'border-[#50CD95] bg-[#50CD95]/10 text-[#052B34]' 
-                  : 'border-gray-200 bg-white/50 text-gray-500 hover:border-gray-300'
-              }`}
-            >
-              <span className="material-symbols-outlined text-2xl">person</span>
-              Patient
-            </button>
-            <button
-              onClick={() => setRegRole('nutritionist')}
-              className={`flex-1 py-3 px-4 rounded-xl border-2 text-sm font-semibold transition-all flex flex-col items-center gap-2 ${
-                regRole === 'nutritionist' 
-                  ? 'border-[#052B34] bg-[#052B34]/5 text-[#052B34]' 
-                  : 'border-gray-200 bg-white/50 text-gray-500 hover:border-gray-300'
-              }`}
-            >
-              <span className="material-symbols-outlined text-2xl">medical_services</span>
-              Nutritionist
-            </button>
-          </div>
+          <p className="text-sm text-gray-500 mb-8">Join CaloAI and start your journey</p>
 
           {[
             { label: 'Full name', id: 'reg-name', type: 'text', val: regName, set: setRegName, err: regErrors.name, field: 'name', placeholder: 'Enter your full name', auto: 'name' },

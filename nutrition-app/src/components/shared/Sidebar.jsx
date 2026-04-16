@@ -11,6 +11,7 @@ const mainLinks = [
   { to: '/dashboard/recommendations', icon: 'auto_awesome', label: 'Recommendations' },
   { to: '/dashboard/book', icon: 'event', label: 'Book Consultation' },
   { to: '/dashboard/profile',   icon: 'person', label: 'Profile' },
+  { to: '/apply-nutritionist', icon: 'medical_services', label: 'Apply as Nutritionist' },
 ]
 
 const roleLinks = [
@@ -25,6 +26,7 @@ const mobileLinks = [
   { to: '/dashboard/progress',  icon: 'insights', label: 'Progress' },
   { to: '/dashboard/book', icon: 'event', label: 'Book' },
   { to: '/dashboard/profile',   icon: 'person', label: 'Profile' },
+  { to: '/apply-nutritionist', icon: 'medical_services', label: 'Apply' },
 ]
 
 // ── Material icon helper ───────────────────────────────────────────────────────
