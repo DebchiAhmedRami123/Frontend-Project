@@ -259,16 +259,17 @@ def PatientRole(user_id):
         loaded_data = schema.load(request.get_json())
         user_uuid = uuid.UUID(user_id)  # Convert string to UUID
     except ValidationError as e:
-        return jsonify({'message': e.messages, 'code': 422})
+        return jsonify({'message': e.messages}), 422
     except ValueError:
         return jsonify({'message':'Ivalid UUID format'}), 400
     
     patient = register_as_patient(user_uuid, loaded_data)
-    
+    if not patient:
+        return jsonify({'message': 'User not found'}), 404
+        
     return jsonify({
         'message': 'User registered as patient successfully!',
     }),200
-
 
 
 @bp_auth.route('/user/<user_id>/role', methods=['POST'])
@@ -279,8 +280,17 @@ def NutritionistRole(user_id):
         loaded_data = schema.load(request.get_json())
         user_uuid = uuid.UUID(user_id)  # Convert string to UUID
     except ValidationError as e:
-        return jsonify({'message': e.messages, 'code': 422})
+        return jsonify({'message': e.messages}), 422
     except ValueError:
         return jsonify({'message':'Ivalid UUID format'}), 400
     
-    Nutritionist = register_as_nutritionist(user_uuid, loaded_data)
+    target_nutritioist = db.session.get(User,user_uuid)
+    if not target_nutritioist:
+        return jsonify({'message':'user not found'}), 400
+    
+    target_nutritioist.status = StatusEnum.PENDING
+    db.session.commit()
+    redis_client.set(f"nutritionist_request:{user_id}",json.dumps(loaded_data))
+    #send email to the admin to notify him about this request and with link to redirect it to its account in the exact page 
+    return jsonify({'message':'The users status is pending and its request is being processed; please wait for a response '
+    '(rejected or approved)'}), 200

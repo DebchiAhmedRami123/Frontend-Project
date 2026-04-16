@@ -12,6 +12,7 @@ from App.Admin.utils import (
     send_deleted_account_notification,
     send_block_account_notification
 )
+from App.utils import register_as_nutritionist
 from App.Admin.utils import log_status_change
 from App.auth.userSchemas import AdminSignInSchema
 from App.extensions import bc
@@ -225,7 +226,19 @@ def change_user_status(user_id):
 @super_admin_required
 @permission_required('view_users')
 def list_admins():
-    admins = db.session.execute(select(Admin)).scalars().all()
+    # when user select this option must be for every pending user (wait to be nutritionist) button click on it for show the details of the user and approve or reject it from this page
+    status = request.args.get('status')
+    admins = []
+    if not status:
+        admins = db.session.execute(select(Admin)).scalars().all()
+    else:
+        try:
+            status_enum = StatusEnum(status.upper())
+            admins = db.session.execute(select(Admin).where(Admin.status == status_enum)).scalars().all()
+        except ValueError:
+            return jsonify({'error': 'Invalid status value'}), 400
+    if not admins:
+        return jsonify({'error': 'No admins found'}), 200
     return jsonify(admin_schema.dump(admins, many=True)), 200
 
 @bp_admin.route('/users/admins', methods=['POST']) # create
@@ -310,15 +323,14 @@ def approve_nutritionist(user_id):
     nutritionist        = db.session.get(User,user_id)
     if not nutritionist:
         return jsonify({'error': 'User not found'}), 404
-    if nutritionist.user_type != 'nutritionist':
-        return jsonify({'error': 'User is not a nutritionist'}), 400
+    if nutritionist.user_type == 'nutritionist':
+        return jsonify({'error': 'User is already a nutritionist'}), 400
     
-    if nutritionist.status == StatusEnum.ACTIVE:
-        return jsonify({'message': 'Nutritionist is already approved'}), 200
+    if nutritionist.status != StatusEnum.PENDING:
+        return jsonify({'message': 'this user is not from the pending nutritionists'}), 400
     
     old_status = nutritionist.status
-    nutritionist.status = StatusEnum.ACTIVE
-    db.session.commit()
+    register_as_nutritionist(user_id)
     log_status_change(
         user_id=uuid.UUID(nutritionist.id),
         old_status=old_status,
@@ -334,6 +346,8 @@ def approve_nutritionist(user_id):
 @permission_required('approve_nutritionist')
 def reject_nutritionist(user_id):
     nutritionist        = db.session.get(User,user_id)
+    data = request.get_json() or {}
+    actual_reason = data.get('reason', 'No reason provided')
     if not nutritionist:
         return jsonify({'error': 'User not found'}), 404
     if nutritionist.user_type != 'nutritionist':
@@ -341,7 +355,7 @@ def reject_nutritionist(user_id):
     if nutritionist.status == 'rejected':
         return jsonify({'message': 'Nutritionist is already rejected'}), 200
     old_status = nutritionist.status
-    nutritionist.status = StatusEnum.INACTIVE
+    nutritionist.status = StatusEnum.INACTIVE # Later, we try to delete this user automatically after a specified period of time.
     log_status_change(
         user_id=uuid.UUID(nutritionist.id),
         old_status=old_status,
@@ -349,7 +363,7 @@ def reject_nutritionist(user_id):
         changed_by=uuid.UUID(get_jwt_identity()['id']),
         reason='rejected as nutritionist'
     )
-    send_rejected_notification(nutritionist)
+    send_rejected_notification(nutritionist, actual_reason)
     return jsonify({'message': 'Nutritionist rejected and received an email notification'})
 
 @bp_admin.route('/users/nutritionists/<int:user_id>/', methods=['POST'])

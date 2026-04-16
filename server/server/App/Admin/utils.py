@@ -77,11 +77,11 @@ def send_apporval_notification(user):
         </div>
     '''
     
-def send_rejected_notification(user):
+def send_rejected_notification(user, actual_reason):
     mess = Message('Rejection notification',
                    sender='aouabdianaoufel@gmail.com',
                    recipients=[user.email])
-    mess.html = '''
+    mess.html = f'''
         <div>
             <!-- Overlay -->
             <div style="
@@ -113,7 +113,9 @@ def send_rejected_notification(user):
                     This may be due to incomplete or insufficient information.  
                     You can review your application and submit it again.
                 </p>
-        
+                <p>
+                    <strong>Reason:</strong> <span style="color: #dc3545;">{actual_reason}</span>
+                </p>
                 <!-- Button -->
                 <a href="#"
                     style="

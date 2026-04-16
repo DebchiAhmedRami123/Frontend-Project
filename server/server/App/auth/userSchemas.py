@@ -1,4 +1,4 @@
-from ..models import User, db
+from ..models import User,  Nutritionist, db
 from marshmallow import ValidationError, validate, validates, validates_schema, EXCLUDE, Schema, fields, pre_load
 from ..extensions import ma
 
@@ -34,6 +34,9 @@ class SignSchema(BaseSchema):
         if db.session.query(User).filter(User.email == data).first():
             raise ValidationError("Email already exists", field_name="email")
 
+class AdminSignInSchema(SignSchema):
+    is_super_admin = ma.auto_field(required=False, dump_only=True)
+    
 class LoginSchema(BaseSchema):
     email = ma.auto_field(required=True)
     password = ma.auto_field(required=False, load_only=True)
@@ -60,13 +63,11 @@ class PatientRoleSchema(BaseSchema):
     weight_goal = ma.auto_field(required=True, validate=validate.Range(min=5))
 
 class NutritionistRoleSchema(BaseSchema):
-    speciality = ma.auto_field(required=True, validate=validate.Length(min=2, max=100))
-    bio = ma.auto_field(required=False, validate=validate.Length(max=500))
-    years_of_experience = ma.auto_field(required=True, validate=validate.Range(min=0,max=50))
+    class Meta:
+        model = Nutritionist
+        load_instance = False
+        fields = ( # this only the allowed fields to retrieved from the model and serialized, the rest will be ignored
+            'specialty', 'years_of_experience', 'license_number', 'license_issuer', 'license_expiry', 'license_doc' 
+        )
 
-class UserStatusUpdateSchema(BaseSchema):
-    status = fields.Str(required=True, validate=validate.OneOf(["active", "inactive", "banned"]))
-
-class AdminSignInSchema(SignSchema):
-    is_super_admin = ma.auto_field(required=False, dump_only=True)
 
