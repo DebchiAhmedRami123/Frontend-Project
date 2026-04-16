@@ -15,14 +15,14 @@ export default function AdminLayout() {
   const navLinks = [
     { name: 'Platform Stats', path: '/admin/stats', icon: 'query_stats' },
     { name: 'Users', path: '/admin/users', icon: 'group' },
-    { name: 'Nutritionists', path: '/admin/nutritionists', icon: 'medical_information' },
-    { name: 'Assign Control', path: '/admin/assign', icon: 'link' }
+    { name: 'Nutritionist Approvals', path: '/admin/nutritionists', icon: 'medical_information' },
+    { name: 'System Admins', path: '/admin/system-admins', icon: 'admin_panel_settings' }
   ]
 
   const getPageTitle = () => {
+    if (location.pathname.includes('system-admins')) return "System Administators"
     if (location.pathname.includes('users')) return "Users Directory"
     if (location.pathname.includes('nutritionists')) return "Nutritionists Review"
-    if (location.pathname.includes('assign')) return "Alliance & Assignment"
     return "Platform Statistics"
   }
 

@@ -8,6 +8,7 @@ import Login from '../pages/public/Login'
 import RegisterUser from '../pages/public/RegisterUser'
 import Contact from '../pages/public/Contact'
 import ApplyNutritionist from '../pages/public/ApplyNutritionist'
+import CheckoutPlaceholder from '../pages/public/CheckoutPlaceholder'
 
 // user
 import UserDashboard from '../pages/user/Dashboard'
@@ -15,8 +16,11 @@ import Progress from '../pages/user/Progress'
 import FoodScan from '../pages/user/FoodScan'
 import MealLog from '../pages/user/MealLog'
 import Recommendations from '../pages/user/Recommendations'
+import NutritionistMarketplace from '../pages/user/NutritionistMarketplace'
+import NutritionistDetail from '../pages/user/NutritionistDetail'
 import BookConsultation from '../pages/user/BookConsultation'
 import UserProfile from '../pages/user/Profile'
+import MealDetails from '../pages/user/MealDetails'
 
 import NutritionistLayout from '../pages/nutritionist/NutritionistLayout'
 import NutritionistDashboard from '../pages/nutritionist/Dashboard'
@@ -33,7 +37,7 @@ import ManageUsers from '../pages/admin/ManageUsers'
 import ApproveNutritionists from '../pages/admin/ApproveNutritionists'
 import ManageSubscriptions from '../pages/admin/ManageSubscriptions'
 import Inquiries from '../pages/admin/Inquiries'
-import AssignNutritionist from '../pages/admin/AssignNutritionist'
+import ManageAdmins from '../pages/admin/ManageAdmins'
 
 export default function AppRouter() {
   return (
@@ -45,6 +49,7 @@ export default function AppRouter() {
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<RegisterUser />} />
         <Route path="/apply-nutritionist" element={<ApplyNutritionist />} />
+        <Route path="/checkout" element={<CheckoutPlaceholder />} />
         <Route path="/contact" element={<Contact />} />
 
         {/* ── Protected ── */}
@@ -57,8 +62,11 @@ export default function AppRouter() {
             <Route path="/dashboard/scan" element={<FoodScan />} />
             <Route path="/dashboard/log" element={<MealLog />} />
             <Route path="/dashboard/recommendations" element={<Recommendations />} />
+            <Route path="/nutritionists" element={<NutritionistMarketplace />} />
+            <Route path="/nutritionists/:id" element={<NutritionistDetail />} />
             <Route path="/dashboard/book" element={<BookConsultation />} />
             <Route path="/dashboard/profile" element={<UserProfile />} />
+            <Route path="/dashboard/meals/:id" element={<MealDetails />} />
           </Route>
 
           {/* Nutritionist */}
@@ -81,7 +89,7 @@ export default function AppRouter() {
               <Route path="/admin/nutritionists" element={<ApproveNutritionists />} />
               <Route path="/admin/subscriptions" element={<ManageSubscriptions />} />
               <Route path="/admin/inquiries" element={<Inquiries />} />
-              <Route path="/admin/assign" element={<AssignNutritionist />} />
+              <Route path="/admin/system-admins" element={<ManageAdmins />} />
             </Route>
           </Route>
 
