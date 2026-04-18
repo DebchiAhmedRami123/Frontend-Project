@@ -6,7 +6,7 @@
 @tailwind utilities;
 
 /* ── Keep all your existing CaloAI Design System stuff here! ── */
-@theme {
+:root {
   --color-primary: #006c49;
   /* ... your other variables ... */
 }
