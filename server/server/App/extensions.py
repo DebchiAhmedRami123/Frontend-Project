@@ -2,10 +2,20 @@ from flask_marshmallow import Marshmallow
 from flask_bcrypt import Bcrypt
 from flask_jwt_extended import JWTManager
 from flask_mail import Mail
+from flask_sqlalchemy import SQLAlchemy
+from sqlalchemy.orm import DeclarativeBase
 from itsdangerous import URLSafeTimedSerializer as serializer
 import time
 from datetime import timedelta
 
+
+class Base(DeclarativeBase):
+    def __repr__(self):
+        cols = [f"{c}={getattr(self, c)}" for c in self.__mapper__.columns.keys()]
+        return f"{self.__class__.__name__}({', '.join(cols)})"
+
+
+db = SQLAlchemy(model_class=Base)
 bc = Bcrypt()
 ma = Marshmallow()
 mail = Mail()
@@ -70,7 +80,13 @@ class MemoryStore:
 
 try:
     import redis
-    redis_client = redis.Redis(host="localhost", port=6379, db=0, decode_responses=True)
+    redis_client = redis.Redis(
+        host="localhost", 
+        port=6379, 
+        db=0, 
+        decode_responses=True,
+        socket_connect_timeout=1
+    )
     redis_client.ping()
 except Exception:
     print("WARNING: Redis not available — using in-memory store (development mode)")

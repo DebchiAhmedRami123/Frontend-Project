@@ -1,27 +1,7 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-
-
-const mockDashboardData = {
-  user: { name: "Rami", goal: "Lean Muscle & Fat Loss" },
-  dailyProgress: {
-    calories: { consumed: 1250, target: 2200 },
-    macros: {
-      protein: { consumed: 95, target: 160 },
-      carbs: { consumed: 110, target: 200 },
-      fats: { consumed: 45, target: 80 }
-    }
-  },
-  aiRecommendation: {
-    title: "Next Meal: Carb-Cycling Target",
-    suggestion: "To hit your protein goals while managing carbs, we recommend a grilled chicken and quinoa bowl.",
-    macros: { protein: "40g", carbs: "30g", fats: "12g" }
-  },
-  recentMeals: [
-    { id: 1, name: "Protein Oatmeal", time: "08:30 AM", calories: 450 },
-    { id: 2, name: "Chicken & Rice", time: "01:15 PM", calories: 600 }
-  ]
-};
+import useAuth from '../../hooks/useAuth';
+import MealDetailsModal from '../../components/modals/MealDetailsModal';
 
 // Circular Progress Component
 const CircularProgress = ({ consumed, target }) => {
@@ -87,8 +67,53 @@ const MacroBar = ({ label, consumed, target, colorClass }) => {
 };
 
 export default function DashboardOverview() {
-  const { user, dailyProgress, aiRecommendation, recentMeals } = mockDashboardData;
   const navigate = useNavigate();
+  const { user } = useAuth();
+  const [data, setData] = useState(null);
+  const [recentMeals, setRecentMeals] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [selectedDate, setSelectedDate] = useState(null);
+  const [selectedMeal, setSelectedMeal] = useState(null);
+
+  const fetchDashboard = async (dateParam = null) => {
+    setLoading(true);
+    try {
+      const { getDashboardStats, getTodayMeals } = await import('../../api/mealApi');
+      const [stats, meals] = await Promise.all([
+        getDashboardStats(dateParam),
+        getTodayMeals(dateParam)
+      ]);
+      setData(stats);
+      
+      const formattedMeals = meals.map(m => {
+        const d = new Date(m.logged_at);
+        const time = d.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+        return { ...m, time }; // Keep entire meal object for details modal
+      });
+      setRecentMeals(formattedMeals);
+    } catch (err) {
+      console.error("Failed to load dashboard data", err);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchDashboard(selectedDate);
+  }, [selectedDate]);
+
+  if (loading && !data) {
+    return <div className="p-8 text-center text-slate-500 animate-pulse">Loading engine metrics...</div>;
+  }
+
+  const { dailyProgress, history } = data || {};
+  
+  // Create a placeholder AI recommendation for now
+  const aiRecommendation = {
+    title: "Next Meal: Protein Engine",
+    suggestion: "To meet today's goals, consider a meal focused on lean protein.",
+    macros: { protein: "40g", carbs: "30g", fats: "12g" }
+  };
 
   return (
     <div className="bg-slate-50 min-h-screen text-slate-800 p-4 md:p-8 w-full animate-fade-in font-body overflow-x-hidden">
@@ -97,10 +122,10 @@ export default function DashboardOverview() {
         {/* Header section */}
         <header>
           <h1 className="text-4xl font-extrabold tracking-tight text-teal-950">
-            Welcome back, {user.name} 👋
+            Welcome back, {user?.first_name || 'User'} 👋
           </h1>
           <p className="text-slate-500 font-medium mt-2 text-lg">
-            Current Goal: <span className="text-teal-700 font-bold">{user.goal}</span>
+            Current Goal: <span className="text-teal-700 font-bold">{data.user?.goal || 'Health & Fitness'}</span>
           </p>
         </header>
 
@@ -174,31 +199,74 @@ export default function DashboardOverview() {
             </div>
           </div>
 
-          {/* Card 3: Today's Timeline */}
-          <div className="lg:col-span-2 bg-white/60 backdrop-blur-md rounded-3xl p-8 shadow-xl shadow-teal-900/5 border border-white">
-            <div className="flex justify-between items-center mb-8 border-b border-slate-100 pb-4">
-              <h2 className="text-2xl font-extrabold text-teal-950">Today's Timeline</h2>
-              <button className="text-sm font-bold text-teal-600 hover:text-teal-800 transition-colors uppercase tracking-wider">
-                View Diary
+          {/* Card 3: Timeline & History */}
+          <div className="lg:col-span-2 bg-white/60 backdrop-blur-md rounded-3xl p-8 shadow-xl shadow-teal-900/5 border border-white flex flex-col">
+            <div className="flex flex-col md:flex-row md:items-center justify-between mb-8 pb-4 border-b border-slate-100 gap-4">
+              <h2 className="text-2xl font-extrabold text-teal-950">
+                {selectedDate && selectedDate !== new Date().toISOString().split('T')[0] ? `Timeline: ${selectedDate}` : "Today's Timeline"}
+              </h2>
+              <button 
+                onClick={() => setSelectedDate(null)} 
+                className={`text-sm font-bold transition-all uppercase tracking-wider ${selectedDate ? 'text-teal-600 hover:text-teal-800' : 'text-slate-300 pointer-events-none'}`}
+              >
+                Back to Today
               </button>
             </div>
             
-            <div className="space-y-4">
+            {/* 7-Day History Scroller */}
+            {history && history.length > 0 && (
+              <div className="flex gap-2 overflow-x-auto pb-4 mb-6 scrollbar-hide">
+                {history.map((h) => (
+                  <button
+                    key={h.date}
+                    onClick={() => setSelectedDate(h.date)}
+                    className={`flex flex-col items-center justify-center min-w-[70px] rounded-2xl py-3 transition-colors border-2 ${
+                      (!selectedDate && h.date === history[history.length-1].date) || selectedDate === h.date
+                        ? 'bg-teal-600 border-teal-600 text-white shadow-lg shadow-teal-900/20' 
+                        : 'bg-white border-transparent text-slate-500 hover:bg-slate-50 border-slate-100'
+                    }`}
+                  >
+                    <span className={`text-[10px] font-extrabold tracking-widest uppercase mb-1 ${(!selectedDate && h.date === history[history.length-1].date) || selectedDate === h.date ? 'text-teal-100' : 'text-slate-400'}`}>
+                      {h.label}
+                    </span>
+                    <span className="font-black text-lg">
+                      {h.date.split('-')[2]}
+                    </span>
+                    {/* Tiny dot indicator for met_goal */}
+                    <div className={`w-1.5 h-1.5 rounded-full mt-2 ${h.met_goal ? ((!selectedDate && h.date === history[history.length-1].date) || selectedDate === h.date ? 'bg-white' : 'bg-teal-500') : 'bg-transparent'}`} />
+                  </button>
+                ))}
+              </div>
+            )}
+            
+            <div className="space-y-4 flex-1">
               {recentMeals.length === 0 && (
-                 <p className="text-slate-400 font-medium text-center py-6">No meals logged yet today.</p>
+                 <div className="h-full flex flex-col items-center justify-center py-8">
+                   <div className="w-16 h-16 bg-slate-100 rounded-full flex items-center justify-center mb-4">
+                      <span className="material-symbols-outlined text-slate-300 text-3xl">no_meals</span>
+                   </div>
+                   <p className="text-slate-400 font-medium text-center">No meals logged for this day.</p>
+                 </div>
               )}
               {recentMeals.map((meal) => (
-                <div key={meal.id} className="flex items-center p-4 bg-slate-50/70 rounded-2xl hover:bg-white hover:shadow-md transition-all duration-300 border border-transparent hover:border-slate-100 group">
-                  <div className="w-14 h-14 rounded-full bg-teal-50 flex items-center justify-center text-teal-600 mr-5 flex-shrink-0 group-hover:scale-110 transition-transform">
-                    {/* Placeholder image icon */}
-                    <span className="material-symbols-outlined text-2xl">restaurant</span>
+                <div 
+                  key={meal.id} 
+                  onClick={() => setSelectedMeal(meal)}
+                  className="flex items-center p-4 bg-slate-50/70 rounded-2xl hover:bg-white hover:shadow-md transition-all duration-300 border border-transparent hover:border-slate-200 group cursor-pointer"
+                >
+                  <div className="w-14 h-14 rounded-full bg-teal-50 flex items-center justify-center text-teal-600 mr-5 flex-shrink-0 group-hover:scale-110 transition-transform overflow-hidden border border-slate-100">
+                    {meal.image_url ? (
+                      <img src={`${import.meta.env.VITE_API_URL || 'http://localhost:5000'}${meal.image_url}`} className="w-full h-full object-cover" />
+                    ) : (
+                      <span className="material-symbols-outlined text-2xl">restaurant</span>
+                    )}
                   </div>
                   <div className="flex-1">
-                    <h4 className="font-extrabold text-slate-800 text-lg mb-1">{meal.name}</h4>
+                    <h4 className="font-extrabold text-slate-800 text-lg mb-1 capitalize line-clamp-1">{meal.name}</h4>
                     <span className="text-xs font-semibold text-slate-400 tracking-wide">{meal.time}</span>
                   </div>
-                  <div className="bg-teal-50/50 px-5 py-2 rounded-full border border-teal-100 backdrop-blur-sm group-hover:bg-teal-100/50 transition-colors">
-                    <span className="text-sm font-black text-teal-700">{meal.calories} <span className="opacity-70 text-xs">kcal</span></span>
+                  <div className="bg-white px-5 py-2 rounded-full border border-slate-100 shadow-sm group-hover:border-teal-200 group-hover:bg-teal-50/50 transition-colors">
+                    <span className="text-sm font-black text-teal-700">{Math.round(meal.calories)} <span className="opacity-70 text-xs">kcal</span></span>
                   </div>
                 </div>
               ))}
@@ -226,6 +294,15 @@ export default function DashboardOverview() {
 
         </div>
       </div>
+
+      {/* Render Meal Details Modal if selected */}
+      {selectedMeal && (
+        <MealDetailsModal 
+          meal={selectedMeal} 
+          onClose={() => setSelectedMeal(null)}
+          onUpdate={() => fetchDashboard(selectedDate)}
+        />
+      )}
     </div>
   );
 }
